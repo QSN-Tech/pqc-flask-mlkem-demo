@@ -2,7 +2,8 @@
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![Flask](https://img.shields.io/badge/Flask-3.0.3-green?logo=flask)
 ![pqcrypto](https://img.shields.io/badge/pqcrypto-0.3.4-purple)
-![Demo Screenshot](screenshot.png)
+![Demo Screenshot](Console.png)
+![Demo Screenshot](Quantum_key.png)
 
 # PQC Flask Demo - ML-KEM-1024 Key Exchange
 
@@ -29,4 +30,5 @@ git clone https://github.com/QSN-Tech/pqc-flask-demo.git
 cd pqc-flask-demo
 pip install -r requirements.txt
 python app.py
+
 
