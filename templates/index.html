@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum-Secure Demo - ML-KEM-1024</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a001f, #1a0033, #000814);
+            color: #d4d4ff;
+            font-family: 'Orbitron', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .quantum-glow {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(100, 200, 255, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+            animation: glow 12s infinite alternate;
+            z-index: -1;
+        }
+        @keyframes glow {
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.1); }
+        }
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 15px #4a6bff;
+        }
+        .btn-quantum {
+            background: linear-gradient(45deg, #4a6bff, #00d4ff);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 14px 30px;
+            border-radius: 50px;
+            transition: all 0.4s;
+            box-shadow: 0 0 20px rgba(74, 107, 255, 0.6);
+        }
+        .btn-quantum:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.9);
+        }
+        .card-quantum {
+            background: rgba(15, 15, 50, 0.65);
+            border: 1px solid #4a6bff;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(74, 107, 255, 0.3);
+        }
+        .copy-btn {
+            background: #1e3a8a;
+            border: 1px solid #4a6bff;
+            color: #d4d4ff;
+            transition: 0.3s;
+        }
+        .copy-btn:hover {
+            background: #3b82f6;
+        }
+        pre {
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="quantum-glow"></div>
 
+    <div class="container d-flex flex-column align-items-center justify-content-center min-vh-100 text-center px-3">
+        <h1 class="display-4 mb-4 text-info">Quantum-Secure Demo</h1>
+        <p class="lead mb-5 opacity-75">ML-KEM-1024 Post-Quantum Key Exchange</p>
+
+        <div class="card card-quantum p-5 shadow-lg" style="max-width: 520px; width: 100%;">
+            <h3 class="mb-4 text-light">Generate Quantum Keypair</h3>
+            <button id="generateBtn" class="btn btn-quantum btn-lg w-100 mb-4">Generate Keypair</button>
+            
+            <div id="loading" class="d-none mt-3">
+                <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;"></div>
+                <p class="mt-3 text-info">Quantum computation in progress...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div class="modal fade" id="keyModal" tabindex="-1" aria-labelledby="keyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark text-light border border-info rounded-4">
+                <div class="modal-header border-info">
+                    <h5 class="modal-title text-info" id="keyModalLabel">Quantum Keypair Generated</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-5">
+                        <label class="form-label fw-bold text-info">Public Key:</label>
+                        <pre id="publicKey" class="bg-black p-3 rounded border border-info text-break" dir="ltr"></pre>
+                        <button class="btn copy-btn btn-sm mt-2" onclick="copyToClipboard('publicKey')">Copy Public Key</button>
+                    </div>
+                    <div>
+                        <label class="form-label fw-bold text-info">Secret Key:</label>
+                        <pre id="secretKey" class="bg-black p-3 rounded border border-info text-break" dir="ltr"></pre>
+                        <button class="btn copy-btn btn-sm mt-2" onclick="copyToClipboard('secretKey')">Copy Secret Key</button>
+                    </div>
+                </div>
+                <div class="modal-footer border-info">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                alert('Copy failed: ' + err);
+            });
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            btn.disabled = true;
+            loading.classList.remove('d-none');
+
+            try {
+                const response = await fetch('/generate');
+                if (!response.ok) throw new Error('Server error');
+                const data = await response.json();
+
+                document.getElementById('publicKey').innerText = data.public_key;
+                document.getElementById('secretKey').innerText = data.secret_key;
+
+                const modal = new bootstrap.Modal(document.getElementById('keyModal'));
+                modal.show();
+            } catch (error) {
+                alert('Error generating keys: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('d-none');
+            }
+        });
+    </script>
+</body>
+</html>
