@@ -24,7 +24,7 @@ def encap():
     
     try:
         pk = binascii.unhexlify(data['public_key'])
-        ciphertext, shared_secret = encrypt(pk)  # ← متد encrypt
+        ciphertext, shared_secret = encrypt(pk)
         return jsonify({
             'ciphertext': binascii.hexlify(ciphertext).decode('utf-8'),
             'shared_secret': binascii.hexlify(shared_secret).decode('utf-8')
@@ -41,7 +41,7 @@ def decap():
     try:
         ct = binascii.unhexlify(data['ciphertext'])
         sk = binascii.unhexlify(data['secret_key'])
-        shared_secret = decrypt(ct, sk)  # ← متد decrypt
+        shared_secret = decrypt(ct, sk)
         return jsonify({
             'shared_secret': binascii.hexlify(shared_secret).decode('utf-8')
         })
@@ -49,4 +49,5 @@ def decap():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+
     app.run(debug=True, port=4000)
