@@ -15,7 +15,8 @@ Simple proof-of-concept for post-quantum key encapsulation using **pqcrypto** li
 
 **Installation & Run**
 ```bash
-git clone https://github.com/YOURUSERNAME/pqc-flask-demo.git
+git clone https://github.com/QSN-Tech/pqc-flask-demo.git
 cd pqc-flask-demo
 pip install -r requirements.txt
+
 python app.py
